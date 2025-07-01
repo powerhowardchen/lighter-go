@@ -36,7 +36,7 @@ func (c *HTTPClient) getAndParseL2HTTPResponse(path string, params map[string]an
 		q.Set(k, fmt.Sprintf("%v", v))
 	}
 	u.RawQuery = q.Encode()
-	resp, err := httpClient.Get(u.String())
+	resp, err := c.client.Get(u.String())
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (c *HTTPClient) SendRawTx(tx txtypes.TxInfo) (string, error) {
 	req, _ := http.NewRequest("POST", c.endpoint+"/api/v1/sendTx", strings.NewReader(data.Encode()))
 	req.Header.Set("Channel-Name", c.channelName)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := httpClient.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return "", err
 	}
