@@ -85,8 +85,8 @@ func (txInfo *L2UpdateLeverageTxInfo) Hash(lighterChainId uint32, extra ...g.Ele
 
 	elems = append(elems, g.FromInt64(txInfo.AccountIndex))
 	elems = append(elems, g.FromUint32(uint32(txInfo.ApiKeyIndex)))
-	elems = append(elems, g.FromInt64(int64(txInfo.MarketIndex)))
-	elems = append(elems, g.FromInt64(int64(txInfo.InitialMarginFraction)))
+	elems = append(elems, g.FromUint32(uint32(txInfo.MarketIndex)))
+	elems = append(elems, g.FromUint32(uint32(txInfo.InitialMarginFraction)))
 
 	return p2.HashToQuinticExtension(elems).ToLittleEndianBytes(), nil
 }
