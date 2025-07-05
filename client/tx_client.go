@@ -103,3 +103,9 @@ func (c *TxClient) GetAuthToken(deadline time.Time) (string, error) {
 func (c *TxClient) HTTP() *HTTPClient {
 	return c.apiClient
 }
+
+func (c *TxClient) Close() {
+	if c.apiClient != nil {
+		c.apiClient.KeepAliveCancel()
+	}
+}
