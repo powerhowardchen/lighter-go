@@ -13,6 +13,7 @@ import (
 type HTTPClient struct {
 	mu                     sync.Mutex
 	proxy                  func(*http.Request) (*url.URL, error)
+	proxyIP                string
 	client                 *http.Client
 	lastConnectAt          time.Time
 	endpoint               string
@@ -21,13 +22,14 @@ type HTTPClient struct {
 	autoKeepAliveCanceller context.CancelFunc
 }
 
-func NewHTTPClient(proxy func(*http.Request) (*url.URL, error), baseUrl string) (p *HTTPClient) {
+func NewHTTPClient(proxy func(*http.Request) (*url.URL, error), proxyIP, baseUrl string) (p *HTTPClient) {
 	if baseUrl == `` {
 		return nil
 	}
 
 	p = &HTTPClient{
 		proxy:               proxy,
+		proxyIP:             proxyIP,
 		endpoint:            baseUrl,
 		channelName:         "",
 		fatFingerProtection: true,
@@ -64,6 +66,10 @@ func (p *HTTPClient) prepare() {
 		Transport: transport,
 		Timeout:   20 * time.Second,
 	}
+}
+
+func (p *HTTPClient) ProxyIP() string {
+	return p.proxyIP
 }
 
 func (p *HTTPClient) KeepAliveCancel() {
