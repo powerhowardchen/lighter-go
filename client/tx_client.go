@@ -105,7 +105,4 @@ func (c *TxClient) HTTP() *HTTPClient {
 }
 
 func (c *TxClient) Close() {
-	if c.apiClient != nil {
-		c.apiClient.KeepAliveCancel()
-	}
 }

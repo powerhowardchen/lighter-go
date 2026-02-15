@@ -2,12 +2,13 @@ package client
 
 import (
 	"context"
-	"golang.org/x/net/http2"
 	"net"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
+
+	"golang.org/x/net/http2"
 )
 
 type HTTPClient struct {
@@ -70,52 +71,4 @@ func (p *HTTPClient) prepare() {
 
 func (p *HTTPClient) ProxyIP() string {
 	return p.proxyIP
-}
-
-func (p *HTTPClient) KeepAliveCancel() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	if p.autoKeepAliveCanceller != nil {
-		p.autoKeepAliveCanceller()
-		p.autoKeepAliveCanceller = nil
-	}
-}
-
-func (p *HTTPClient) KeepAliveRun() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	if p.autoKeepAliveCanceller != nil {
-		return
-	}
-
-	var ctx context.Context
-
-	ctx, p.autoKeepAliveCanceller = context.WithCancel(context.Background())
-
-	touch := func(now time.Time) {
-		p.mu.Lock()
-		defer p.mu.Unlock()
-		if now.Sub(p.lastConnectAt) >= time.Minute {
-			if req, err := http.NewRequest(`HEAD`,
-				p.endpoint+`/api/v1/sendTx`, nil); err == nil {
-				_, _ = p.client.Do(req)
-				p.lastConnectAt = now
-			}
-		}
-	}
-
-	go func() {
-		touch(time.Now())
-		t := time.NewTicker(10 * time.Second)
-		for {
-			select {
-			case n := <-t.C:
-				go touch(n)
-			case <-ctx.Done():
-				return
-			}
-		}
-	}()
 }
